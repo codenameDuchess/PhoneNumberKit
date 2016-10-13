@@ -72,6 +72,8 @@
 		C6DF6CDF1D1B18D800259F4B /* PhoneNumberParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342418811BB70F5200EE70E7 /* PhoneNumberParser.swift */; };
 		C6DF6CE01D1B18D800259F4B /* RegexManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34566C991BC112C500715E6B /* RegexManager.swift */; };
 		C6DF6CE11D1B18DD00259F4B /* PhoneNumberMetadata.json in Resources */ = {isa = PBXBuildFile; fileRef = 3435CC951BBFF66F003F953B /* PhoneNumberMetadata.json */; };
+		EAD2BD001DAF55050070BCF9 /* Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD2BCFE1DAF55050070BCF9 /* Metadata.swift */; };
+		EAD2BD011DAF55050070BCF9 /* RegularExpressions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD2BCFF1DAF55050070BCF9 /* RegularExpressions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,6 +114,8 @@
 		C6DF6C911D1B120400259F4B /* PhoneNumberKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoneNumberKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6DF6CA71D1B145300259F4B /* PhoneNumberKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhoneNumberKit.h; sourceTree = "<group>"; };
 		C6DF6CCC1D1B18B000259F4B /* PhoneNumberKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoneNumberKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAD2BCFE1DAF55050070BCF9 /* Metadata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Metadata.swift; sourceTree = "<group>"; };
+		EAD2BCFF1DAF55050070BCF9 /* RegularExpressions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegularExpressions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,6 +163,8 @@
 		340757841DA03A1700D493A0 /* Metadata */ = {
 			isa = PBXGroup;
 			children = (
+				EAD2BCFE1DAF55050070BCF9 /* Metadata.swift */,
+				EAD2BCFF1DAF55050070BCF9 /* RegularExpressions.swift */,
 				346922661BC01DCC0023482F /* MetadataManager.swift */,
 				342548EF1BE7EED500FBE524 /* MetadataTypes.swift */,
 			);
@@ -463,6 +469,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAD2BD001DAF55050070BCF9 /* Metadata.swift in Sources */,
 				11C2EF391D62BC3200052D44 /* NSRegularExpression+Swift.swift in Sources */,
 				342418821BB70F5200EE70E7 /* PhoneNumberParser.swift in Sources */,
 				346922671BC01DCC0023482F /* MetadataManager.swift in Sources */,
@@ -470,6 +477,7 @@
 				343B850D1C62A25600918E46 /* TextField.swift in Sources */,
 				346922691BC023A60023482F /* PhoneNumberKit.swift in Sources */,
 				343B850C1C62A25600918E46 /* PartialFormatter.swift in Sources */,
+				EAD2BD011DAF55050070BCF9 /* RegularExpressions.swift in Sources */,
 				3422D9BA1BE6A2D500867D02 /* ParseManager.swift in Sources */,
 				34566C9A1BC112C500715E6B /* RegexManager.swift in Sources */,
 				346DEC0B1BE4B2F900A63274 /* ParseOperation.swift in Sources */,

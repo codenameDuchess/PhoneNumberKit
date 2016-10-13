@@ -10,27 +10,18 @@ import Foundation
 
 class Formatter {
     
-    weak var regexManager: RegexManager?
-    
-    init(phoneNumberKit: PhoneNumberKit) {
-        self.regexManager = phoneNumberKit.regexManager
-    }
-    
-    init(regexManager: RegexManager) {
-        self.regexManager = regexManager
-    }
-
-    
     // MARK: Formatting functions
+    let regex = RegularExpressions.sharedInstance
     
     /**
      Formats phone numbers for display
      - Parameter phoneNumber: Phone number object.
      - Returns: Modified national number ready for display.
      */
-    func format(phoneNumber: PhoneNumber, formatType: PhoneNumberFormat, regionMetadata: MetadataTerritory?) -> String {
+    func formatPhoneNumber(_ phoneNumber: PhoneNumber, formatType: PhoneNumberFormat) -> String {
+        let metadata = Metadata.sharedInstance
         var formattedNationalNumber = phoneNumber.adjustedNationalNumber()
-        if let regionMetadata = regionMetadata {
+        if let regionMetadata = metadata.metadataPerCode[phoneNumber.countryCode] {
             formattedNationalNumber = formatNationalNumber(formattedNationalNumber, regionMetadata: regionMetadata, formatType: formatType)
             if let formattedExtension = formatExtension(phoneNumber.numberExtension, regionMetadata: regionMetadata) {
                 formattedNationalNumber = formattedNationalNumber + formattedExtension
@@ -63,20 +54,19 @@ class Formatter {
      - Returns: Modified nationalNumber for display.
      */
     func formatNationalNumber(_ nationalNumber: String, regionMetadata: MetadataTerritory, formatType: PhoneNumberFormat) -> String {
-        guard let regexManager = regexManager else { return nationalNumber }
         let formats = regionMetadata.numberFormats
         var selectedFormat: MetadataPhoneNumberFormat?
         for format in formats {
             if let leadingDigitPattern = format.leadingDigitsPatterns?.last {
-                if (regexManager.stringPositionByRegex(leadingDigitPattern, string: String(nationalNumber)) == 0) {
-                    if (regexManager.matchesEntirely(format.pattern, string: String(nationalNumber))) {
+                if (regex.stringPositionByRegex(leadingDigitPattern, string: String(nationalNumber)) == 0) {
+                    if (regex.matchesEntirely(format.pattern, string: String(nationalNumber))) {
                         selectedFormat = format
                         break;
                     }
                 }
             }
             else {
-                if (regexManager.matchesEntirely(format.pattern, string: String(nationalNumber))) {
+                if (regex.matchesEntirely(format.pattern, string: String(nationalNumber))) {
                     selectedFormat = format
                     break;
                 }
@@ -89,15 +79,15 @@ class Formatter {
             var formattedNationalNumber = String()
             var prefixFormattingRule = String()
             if let nationalPrefixFormattingRule = formatPattern.nationalPrefixFormattingRule, let nationalPrefix = regionMetadata.nationalPrefix {
-                prefixFormattingRule = regexManager.replaceStringByRegex(PhoneNumberPatterns.npPattern, string: nationalPrefixFormattingRule, template: nationalPrefix)
-                prefixFormattingRule = regexManager.replaceStringByRegex(PhoneNumberPatterns.fgPattern, string: prefixFormattingRule, template:"\\$1")
+                prefixFormattingRule = regex.replaceStringByRegex(PhoneNumberPatterns.npPattern, string: nationalPrefixFormattingRule, template: nationalPrefix)
+                prefixFormattingRule = regex.replaceStringByRegex(PhoneNumberPatterns.fgPattern, string: prefixFormattingRule, template:"\\$1")
             }
-            if formatType == PhoneNumberFormat.national && regexManager.hasValue(prefixFormattingRule){
-                let replacePattern = regexManager.replaceFirstStringByRegex(PhoneNumberPatterns.firstGroupPattern, string: numberFormatRule, templateString: prefixFormattingRule)
-                formattedNationalNumber = regexManager.replaceStringByRegex(pattern, string: nationalNumber, template: replacePattern)
+            if formatType == PhoneNumberFormat.national && regex.hasValue(prefixFormattingRule as NSString?){
+                let replacePattern = regex.replaceFirstStringByRegex(PhoneNumberPatterns.firstGroupPattern, string: numberFormatRule, templateString: prefixFormattingRule)
+                formattedNationalNumber = self.regex.replaceStringByRegex(pattern, string: nationalNumber, template: replacePattern)
             }
             else {
-                formattedNationalNumber = regexManager.replaceStringByRegex(pattern, string: nationalNumber, template: numberFormatRule)
+                formattedNationalNumber = self.regex.replaceStringByRegex(pattern, string: nationalNumber, template: numberFormatRule)
             }
             return formattedNationalNumber
         }
@@ -110,11 +100,49 @@ class Formatter {
 
 public extension PhoneNumber {
     
+    // MARK: Formatting extenstions to PhoneNumber
+    
+    /**
+    Formats a phone number to E164 format (e.g. +33689123456)
+    - Returns: A string representing the phone number in E164 format.
+    */
+    public func toE164(_ prefix: Bool = true) -> String {
+        let formattedNationalNumber = adjustedNationalNumber()
+        if prefix == false {
+            return formattedNationalNumber
+        }
+        return "+\(String(countryCode))\(formattedNationalNumber)"
+    }
+    
+    /**
+     Formats a phone number to International format (e.g. +33 6 89 12 34 56)
+     - Returns: A string representing the phone number in International format.
+     */
+    public func toInternational(_ prefix: Bool = true) -> String {
+        let formatter = Formatter()
+        let formattedNationalNumber = formatter.formatPhoneNumber(self, formatType: .international)
+        if prefix == false {
+            return formattedNationalNumber
+        }
+        return "+\(String(countryCode)) \(formattedNationalNumber)"
+    }
+    
+    /**
+     Formats a phone number to local national format (e.g. 06 89 12 34 56)
+     - Returns: A string representing the phone number in the local national format.
+     */
+    public func toNational() -> String {
+        let formatter = Formatter()
+        let formattedNationalNumber = formatter.formatPhoneNumber(self, formatType: .national)
+        let formattedNumber = formattedNationalNumber
+        return formattedNumber
+    }
+    
     /**
      Adjust national number for display by adding leading zero if needed. Used for basic formatting functions.
      - Returns: A string representing the adjusted national number.
      */
-    public func adjustedNationalNumber() -> String {
+    fileprivate func adjustedNationalNumber() -> String {
         if self.leadingZero == true {
             return "0" + String(nationalNumber)
         }

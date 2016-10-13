@@ -18,6 +18,7 @@ class ParseOperation<OutputType>: Operation {
     override final var isFinished: Bool { return state == .finished }
     fileprivate var completionHandler: OperationClosure?
     fileprivate var implementationHandler: OperationThrowingClosure?
+    fileprivate var dispatchOnceToken: Int = 0
     fileprivate(set) var output: ParseOperationValue<OutputType> = .none(PhoneNumberError.generalError)
     fileprivate var state = ParseOperationState.initial {
         willSet {
@@ -129,14 +130,22 @@ extension ParseOperation {
     - Parameter parseOperationValue: Output type or error.
     */
     func finish(with parseOperationValue: ParseOperationValue<OutputType>) {
-		guard self.state != .finished else { return }
-		
-		self.output = parseOperationValue
-		guard let completionHandler = self.completionHandler else { return }
-		self.completionHandler = nil
-		self.implementationHandler = nil
-		completionHandler(self)
-		self.state = .finished
+        var once: Void = {
+            self.output = parseOperationValue
+            guard let completionHandler = self.completionHandler else { return }
+            self.completionHandler = nil
+            self.implementationHandler = nil
+            completionHandler(self)
+            self.state = .finished
+        }()
+//        dispatch_once(&dispatchOnceToken) {
+//            self.output = parseOperationValue
+//            guard let completionHandler = self.completionHandler else { return }
+//            self.completionHandler = nil
+//            self.implementationHandler = nil
+//            completionHandler(self)
+//            self.state = .finished
+//        }
     }
 }
 
